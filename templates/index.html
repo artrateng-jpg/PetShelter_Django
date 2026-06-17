@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Приют и Ветклиника «Пушистый друг»</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Ветклиника «Пушистый друг»</h1>
+        <p>Забота о тех, кого приручили</p>
+    </header>
+
+    <nav>
+        <a href="#" data-target="home">Главная</a>
+        <a href="#" data-target="pets" data-filter="all">Все питомцы</a>
+        <a href="#" data-target="pets" data-filter="dogs">Собаки</a>
+        <a href="#" data-target="pets" data-filter="cats">Кошки</a>
+        <a href="#" data-target="pets" data-filter="exotic">Экзотика</a>
+        <a href="#" data-target="journal">Дневник</a>
+        <a href="#" data-target="staff">Персонал</a>
+    </nav>
+
+    <div class="container">
+        <section id="home">
+            <h2>О нашей клинике и приюте</h2>
+            <img src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1000&q=80" alt="Клиника" style="width: 100%; height: 250px; object-fit: cover; border-radius: 8px; margin-bottom: 20px;">
+            <p>Добро пожаловать в <strong>«Пушистый друг»</strong> — место, где здоровье и счастье животных стоят на первом месте! Мы объединили под одной крышей современную ветеринарную клинику и уютный приют для хвостиков, которые всё ещё ищут свой дом.</p>
+            <h3>Почему выбирают нас?</h3>
+            <ul>
+                <li>🩺 <strong>Профессионализм:</strong> Опытные и любящие свое дело ветеринары.</li>
+                <li>🔬 <strong>Оснащение:</strong> Современное оборудование для точной диагностики и лечения.</li>
+                <li>🏠 <strong>Забота:</strong> Просторные и чистые вольеры для подопечных приюта.</li>
+                <li>❤️ <strong>Миссия:</strong> Наша цель — не просто лечить, но и находить любящие семьи для каждого.</li>
+            </ul>
+            
+            <h3>Наша статистика в реальном времени:</h3>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
+                <div style="background: var(--secondary-color); padding: 15px; border-radius: 8px; flex: 1; text-align: center; border: 1px solid #ddd;">
+                    <h4 style="margin: 0; color: var(--primary-color); font-size: 1.8rem;">{{ stats.free }}</h4>
+                    <p style="margin: 5px 0 0 0; font-weight: bold;">Ждут семью</p>
+                </div>
+                <div style="background: var(--secondary-color); padding: 15px; border-radius: 8px; flex: 1; text-align: center; border: 1px solid #ddd;">
+                    <h4 style="margin: 0; color: #2196F3; font-size: 1.8rem;">{{ stats.adopted }}</h4>
+                    <p style="margin: 5px 0 0 0; font-weight: bold;">Уже дома</p>
+                </div>
+                <div style="background: var(--secondary-color); padding: 15px; border-radius: 8px; flex: 1; text-align: center; border: 1px solid #ddd;">
+                    <h4 style="margin: 0; color: #FF9800; font-size: 1.8rem;">{{ stats.total }}</h4>
+                    <p style="margin: 5px 0 0 0; font-weight: bold;">Всего питомцев</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="pets">
+            <h2>Наши пациенты и подопечные</h2>
+            <div class="grid-container" id="pets-container">
+                {% for pet in pets %}
+                <div class="card pet-card" data-category="{% if pet.category.name == 'Собаки' %}dogs{% elif pet.category.name == 'Кошки' %}cats{% else %}exotic{% endif %}">
+                    {% if pet.image %}
+                        <img src="{{ pet.image.url }}" alt="{{ pet.name }}" class="pet-image">
+                    {% else %}
+                        <div style="height:220px; background:#ccc;" class="pet-image"></div>
+                    {% endif %}
+                    <span class="tag tag-{% if pet.category.name == 'Собаки' %}dog{% elif pet.category.name == 'Кошки' %}cat{% else %}exotic{% endif %}">{{ pet.category.name }}</span>
+                    <h3>{{ pet.name }}</h3>
+                    <p><strong>Порода:</strong> {{ pet.breed|default:"Не указана" }}</p>
+                    <p><strong>Возраст:</strong> {% if pet.age_months >= 12 %}Взрослый{% else %}{{ pet.age_months }} мес.{% endif %}</p>
+                    <p>{{ pet.description }}</p>
+                </div>
+                {% empty %}
+                <p>Пока нет добавленных питомцев.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="journal">
+            <h2>Дневник прививок и история болезни</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Кличка (Вид)</th>
+                        <th>Процедура</th>
+                        <th>Лечащий врач</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in medical_records %}
+                    <tr>
+                        <td>{{ record.created_at|date:"d.m.Y" }}</td>
+                        <td>{{ record.pet.name }} ({{ record.pet.category.name }})</td>
+                        <td>{{ record.diagnosis }}</td>
+                        <td>{{ record.vet.full_name|default:"Не назначен" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">Нет записей.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <section id="staff">
+            <h2>Наш персонал</h2>
+            <div class="grid-container">
+                {% for person in specialists %}
+                <div class="card staff-{% if person.role == 'vet' %}vet{% else %}vol{% endif %}">
+                    {% if person.image %}
+                        <img src="{{ person.image.url }}" alt="{{ person.full_name }}" class="staff-image">
+                    {% else %}
+                        <div style="width:150px; height:150px; border-radius:50%; background:#ccc; margin: 0 auto 15px auto;" class="staff-image"></div>
+                    {% endif %}
+                    <h3>{{ person.full_name }}</h3>
+                    <p><strong>Должность:</strong> {{ person.get_role_display }}</p>
+                </div>
+                {% empty %}
+                <p>Персонал не найден.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="contact-info">
+            <p>📍 <strong>Адрес:</strong> г. Москва, ул. Пушистая, д. 12</p>
+            <p>📞 <strong>Телефон:</strong> <a href="tel:+79991234567">+7 (999) 123-45-67</a></p>
+            <p>⏰ <strong>Часы работы:</strong> Ежедневно с 09:00 до 21:00</p>
+        </div>
+        <p>&copy; 2026 Приют и Ветклиника «Пушистый друг». Все права защищены.</p>
+    </footer>
+
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>
