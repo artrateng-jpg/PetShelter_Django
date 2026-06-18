@@ -53,4 +53,5 @@ class AdoptionRequest(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"Заявка
+        return f"Заявка #{self.pk} от {self.name}"
+
